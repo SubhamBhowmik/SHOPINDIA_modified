@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Dialog, DialogContent, TextField, Box, Button, makeStyles, Typography } from '@material-ui/core';
+import { Dialog, DialogContent, TextField, Box, Button, makeStyles, Typography,CircularProgress } from '@material-ui/core';
 import { authenticateLogin, authenticateSignup } from '../../service/api';
 
 const useStyle = makeStyles({
@@ -35,7 +35,9 @@ const useStyle = makeStyles({
         background: 'green',
         color: '#fff',
         height: 48,
-        borderRadius: 2
+        borderRadius: 2,
+        display:'flex',
+       
     },
     requestbtn: {
         textTransform: 'none',
@@ -48,6 +50,11 @@ const useStyle = makeStyles({
     text: {
         color: '#878787',
         fontSize: 12
+    },
+    circle:{
+     height:10,
+     width:10,
+ 
     },
     createText: {
         margin: 'auto 0 5px 0',
@@ -94,6 +101,9 @@ const accountInitialValues = {
 }
 
 const LoginDialog = ({ open, setOpen, setAccount }) => {
+
+    
+const [state, setstate] = useState(true)
     const classes = useStyle();
     const [ login, setLogin ] = useState(loginInitialValues);
     const [ signup, setSignup ] = useState(signupInitialValues);
@@ -113,10 +123,15 @@ const LoginDialog = ({ open, setOpen, setAccount }) => {
     }
 
     const loginUser = async() => {
+        setstate(false)
         let response = await authenticateLogin(login);
-        if(!response) 
+        if(!response) {
+            alert('PLease enter Valid Username and Password');
             showError(true);
+            setstate(true)
+        }
         else {
+            alert('login successful')
             showError(false);
             handleClose();
             setAccount(login.username);
@@ -135,6 +150,7 @@ const LoginDialog = ({ open, setOpen, setAccount }) => {
     }
 
     const handleClose = () => {
+        setstate(true)
         setOpen(false);
         toggleAccount(accountInitialValues.login);
     }
@@ -150,11 +166,24 @@ const LoginDialog = ({ open, setOpen, setAccount }) => {
                     {
                         account.view === 'login' ? 
                         <Box className={classes.login}>
-                            <TextField onChange={(e) => onValueChange(e)} name='username' label='Enter Email/Mobile number' />
+                            <TextField onChange={(e) => onValueChange(e)} name='username' label='Enter Username' />
                             { error && <Typography className={classes.error}>Please enter valid Email ID/Mobile number</Typography> }
                             <TextField onChange={(e) => onValueChange(e)} name='password' label='Enter Password' />
-                            <Typography className={classes.text}>By continuing, you agree to ShopIndia's Terms of Use and Privacy Policy.</Typography>
-                            <Button className={classes.loginbtn} onClick={() => loginUser()} >Login</Button>
+                            <Typography type='password' className={classes.text}>By continuing, you agree to ShopIndia's Terms of Use and Privacy Policy.</Typography>
+                            <Button className={classes.loginbtn} onClick={() => loginUser()} >
+                        
+                         
+                              {
+                                state ?  <Typography>Login</Typography>: <CircularProgress color='white'/>
+                              }
+                      
+                         
+                          
+                           
+                           
+                         
+                            
+                            </Button>
                             <Typography className={classes.text} style={{textAlign:'center'}}>OR</Typography>
                             <Button className={classes.requestbtn}>Request OTP</Button>
                             <Typography className={classes.createText} onClick={() => toggleSignup()}>New to ShopIndia? Create an account</Typography>
